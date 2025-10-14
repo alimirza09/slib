@@ -1,43 +1,64 @@
+CC      = gcc
+LD      = ld
+AR      = ar
 
-CC     = gcc
-LD     = ld
-CFLAGS = -ffreestanding -fno-stack-protector -O2 -Wall -Wextra -Iinclude
-LDFLAGS = -m elf_x86_64 -Ttext 0x401000 -e _start --oformat elf64-x86-64
+# Flags
+CFLAGS      = -ffreestanding -fno-stack-protector -O2 -Wall -Wextra -Iinclude
+LDFLAGS     = -m elf_x86_64 -Ttext 0x401000 -e _start --oformat elf64-x86-64
 
-BUILD  = build
-SRC    = src
-TESTS  = tests
+TEST_GCC_FLAGS = -ffreestanding -O2 -Wall -Wextra -Iinclude \
+                 -fno-stack-protector -fno-pic -fno-pie -no-pie \
+                 -nostdlib -nostartfiles
 
-LIBOBJS = $(BUILD)/crt0.o $(BUILD)/syscall.o $(BUILD)/syscalls.o
-TESTOBJS = $(BUILD)/hello.o
-LIBC_A = $(BUILD)/libc.a
-TARGET = hello.elf
+BUILD   = build
+SRC     = src
+TESTS   = tests
+INCL    = include
+
+LIB_SRCS = crt0.S syscall.S syscalls.c string.c
+LIB_OBJS = $(patsubst %.c,$(BUILD)/%.o,$(patsubst %.S,$(BUILD)/%.o,$(LIB_SRCS)))
+LIBC_A   = $(BUILD)/libc.a
+
+TEST_SRC = $(TESTS)/hello.c
+TEST_OBJ = $(BUILD)/hello.o
+
+TARGET  = hello.elf
 
 all: $(TARGET)
 
-$(BUILD)/crt0.o: $(SRC)/crt0.S
+$(BUILD)/%.o: $(SRC)/%.c
 	@mkdir -p $(BUILD)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(BUILD)/syscall.o: $(SRC)/syscall.S
+$(BUILD)/%.o: $(SRC)/%.S
+	@mkdir -p $(BUILD)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(BUILD)/syscalls.o: $(SRC)/syscalls.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
-$(LIBC_A): $(LIBOBJS)
-	ar rcs $@ $^
+$(LIBC_A): $(LIB_OBJS)
+	@mkdir -p $(BUILD)
+	$(AR) rcs $@ $^
 
 $(BUILD)/hello.o: $(TESTS)/hello.c
+	@mkdir -p $(BUILD)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(TARGET): $(BUILD)/crt0.o $(BUILD)/hello.o $(LIBC_A)
 	$(LD) $(LDFLAGS) -o $@ $^
 
-tests/syscall_test: tests/syscall_test.c src/syscalls.c src/syscall.S
-	$(CC) -nostdlib -static -Iinclude -o $@ tests/syscall_test.c src/syscalls.c src/syscall.S
+$(TESTS)/string_test: $(TESTS)/string_test.c $(LIBC_A) $(BUILD)/crt0.o $(BUILD)/syscall.o $(BUILD)/syscalls.o
+	@mkdir -p $(BUILD)
+	$(CC) $(CFLAGS) -c $(TESTS)/string_test.c -o $(BUILD)/string_test.o
+	$(CC) $(TEST_GCC_FLAGS) -Iinclude -o $@ \
+	    $(BUILD)/string_test.o $(BUILD)/crt0.o $(BUILD)/syscall.o $(BUILD)/syscalls.o $(LIBC_A)
+
+tests/syscall_test:
+	$(CC) -ffreestanding -O2 -Wall -Wextra -Iinclude \
+	    -fno-stack-protector -fno-pic -fno-pie -no-pie \
+	    -nostdlib -nostartfiles \
+	    -o tests/syscall_test \
+	    tests/syscall_test.c src/syscalls.c src/syscall.S src/crt0.S
 
 clean:
-	rm -rf $(BUILD) $(TARGET)
+	rm -rf $(BUILD) $(TARGET) tests/syscall_test $(TESTS)/string_test
 
 .PHONY: all clean
