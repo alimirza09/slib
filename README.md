@@ -3,9 +3,7 @@ A custom C library for sOS.
 
 ## Progress 
 - Some basic syscalls and unistd.h support
-
-## Planned Features
-- Some standard stdio.h features
+- string.h
 
 ## Licensing
 This project is licensed under the GNU General Public License v3 (GPL-3.0-or-later).  
