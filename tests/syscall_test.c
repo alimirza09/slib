@@ -6,7 +6,7 @@ int main() {
     const char *msg = "hello from syscall test\n";
     char buf[64];
 
-    int fd = open(fname, 1); // open for write
+    int fd = open(fname, 1); 
     if (fd < 0) {
         write(1, "open failed\n", 12);
         exit(1);
@@ -15,7 +15,7 @@ int main() {
     write(fd, msg, 22);
     close(fd);
 
-    fd = open(fname, 0); // reopen for read
+    fd = open(fname, 0); 
     if (fd < 0) {
         write(1, "reopen failed\n", 14);
         exit(1);
@@ -32,7 +32,7 @@ int main() {
     write(1, buf, n);
 
     close(fd);
-    unlink(fname);
+    // unlink(fname);
 
     write(1, "\nTest completed successfully\n", 30);
     exit(0);
