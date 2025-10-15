@@ -1,10 +1,13 @@
 # slib
+
 A custom C library for sOS.
 
-## Progress 
+## Progress
+
 - Some basic syscalls and unistd.h support
 - string.h
 
 ## Licensing
-This project is licensed under the GNU General Public License v3 (GPL-3.0-or-later).  
+
+This project is licensed under the GNU General Public License v3 (GPL-3.0-or-later).
 See the [LICENSE](LICENSE) file for details or visit <https://www.gnu.org/licenses/gpl.html>
