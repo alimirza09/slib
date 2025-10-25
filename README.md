@@ -5,7 +5,9 @@ A custom C library for sOS.
 ## Progress
 
 - Some basic syscalls and unistd.h support
-- string.h
+- string.h 
+- incomplete stdio.h
+- stdlib.h
 
 ## Licensing
 
