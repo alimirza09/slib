@@ -19,22 +19,18 @@ TEST_OBJ = $(BUILD)/hello.o
 
 all: $(TARGET)
 
-# Compile C sources
 $(BUILD)/%.o: $(SRC)/%.c
 	@mkdir -p $(BUILD)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-# Assemble .S sources
 $(BUILD)/%.o: $(SRC)/%.S
 	@mkdir -p $(BUILD)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-# Build the static library
 $(LIBC_A): $(LIB_OBJS)
 	@mkdir -p $(BUILD)
 	$(AR) rcs $@ $^
 
-# Build hello.o
 $(BUILD)/hello.o: $(TESTS)/hello.c
 	@mkdir -p $(BUILD)
 	$(CC) $(CFLAGS) -c $< -o $@

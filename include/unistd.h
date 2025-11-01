@@ -14,6 +14,9 @@ ssize_t unlink(const char *path);
 ssize_t mkdir(const char *path);
 ssize_t rmdir(const char *path);
 ssize_t listdir(const char *path, void *buf, size_t bufsize);
+ssize_t gpu_info();
+ssize_t gpu_map(void *user_vaddr);
+ssize_t gpu_flush();
 
 void *mmap(void *addr, size_t length, int flags);
 int munmap(void *addr, size_t length);

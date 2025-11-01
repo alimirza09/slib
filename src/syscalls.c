@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <sys/syscall.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -46,6 +47,17 @@ void *brk(void *addr) {
     return (void *)syscall(SYS_BRK, (long)addr, 0, 0, 0, 0);
 }
 
+ssize_t gpu_map(void *user_vaddr){
+    return syscall(SYS_GPU_MAP, (long)user_vaddr, 0, 0, 0 ,0);
+}
+
+ssize_t gpu_flush(void){
+    return syscall(SYS_GPU_FLUSH , 0 ,0 ,0, 0, 0);
+}
+
+ssize_t gpu_info(){
+    return syscall(SYS_GPU_INFO, 0 ,0 ,0, 0, 0);
+}
 
 void _exit(int status) {
     syscall(SYS_EXIT, status, 0, 0, 0, 0);
